@@ -5,30 +5,42 @@ export interface TourType {
     image: string
     tags: string[]
     description: string
+    category?: string
     type: "co-tour" | "private"
     packageType: "tour"
     duration: string
     period: "Half-Day" | "Full-Day"
     status: "active" | "sold"
     bookedCount: number
+    rating?: number
+    reviewCount?: number
     oldPrice: number
     newPrice: number
     childPrice: number
     minimumPerson: number
     maximumPerson?: number
+    vehicle?: string
+    seatCapacity?: number
     departureTimes: string[]
-    label?: "Recommended" | "Popular" | "Best Value" | "Best seller" | null
+    label?: "Recommended" | "Popular" | "Best Value" | "Best Seller" | null
     isAvailable: boolean
     details: {
         about: string
-        itinerary: string
-        pickupLocation: string
-        note?: string
+        longDescription?: string
+        itinerary: Array<{
+            time: string
+            activity: string
+        }>
+        pickupLocations: string[]
+        pickupGuidelines?: string
+        notes: string[]
+        includes: string[]
         faq: Array<{
             question: string
             answer: string
         }>
     }
+    lastSlotsGeneratedAt?: Date
     createdAt: Date
     updatedAt: Date
 }
@@ -163,6 +175,29 @@ export const tourApi = {
             return await response.json()
         } catch (error) {
             console.error("Error updating tour:", error)
+            throw error
+        }
+    },
+
+    // Create a new tour
+    createTour: async (tourData: any): Promise<{ success: boolean; message: string; data: TourType }> => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/tours`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(tourData),
+            })
+
+            if (!response.ok) {
+                const result = await response.json()
+                throw new Error(result.message || `HTTP error! status: ${response.status}`)
+            }
+
+            return await response.json()
+        } catch (error) {
+            console.error("Error creating tour:", error)
             throw error
         }
     },

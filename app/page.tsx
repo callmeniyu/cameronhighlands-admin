@@ -29,14 +29,10 @@ interface BookingsApiResponse {
 interface Tour {
   status?: string;
 }
-interface Transfer {
-  status?: string;
-}
 
 interface SortedBooking {
   id?: string;
   tour?: string;
-  transfer?: string | null;
   date: string;
   time: string;
   status: string;
@@ -67,15 +63,13 @@ export default function DashboardPage() {
   // Fetch dashboard statistics
   const fetchDashboardStats = async () => {
     try {
-      const [bookingsRes, toursRes, transfersRes] = await Promise.all([
+      const [bookingsRes, toursRes] = await Promise.all([
         fetch("/api/bookings"),
         fetch("/api/tours"),
-        fetch("/api/transfers"),
       ]);
 
       const bookingsData = await bookingsRes.json();
       const toursData = await toursRes.json();
-      const transfersData = await transfersRes.json();
 
       // Calculate total bookings
       const totalBookings = bookingsData.success
@@ -101,13 +95,6 @@ export default function DashboardPage() {
           ).length
         : 0;
 
-      const activeTransfers: number = (transfersData as BookingsApiResponse)
-        .success
-        ? (
-            (transfersData.transfers || transfersData.data || []) as Transfer[]
-          ).filter((transfer: Transfer) => transfer.status === "active").length
-        : 0;
-
       setStats([
         {
           title: "Total Bookings",
@@ -127,12 +114,6 @@ export default function DashboardPage() {
           icon: "🚗",
           link: "/tours",
         },
-        {
-          title: "Active Transfers",
-          value: activeTransfers.toString(),
-          icon: "⏱️",
-          link: "/transfers",
-        },
       ]);
     } catch (error) {
       console.error("Error fetching dashboard stats:", error);
@@ -145,12 +126,6 @@ export default function DashboardPage() {
         },
         { title: "Revenue", value: "Error", icon: "💰", link: "/revenue" },
         { title: "Active Tours", value: "Error", icon: "🚗", link: "/tours" },
-        {
-          title: "Active Transfers",
-          value: "Error",
-          icon: "⏱️",
-          link: "/transfers",
-        },
       ]);
     }
   };
@@ -166,6 +141,7 @@ export default function DashboardPage() {
         // Sort by creation date and take the latest 4
 
         const sortedBookings: SortedBooking[] = (bookings as Booking[])
+          .filter((booking: Booking) => booking.packageType !== "transfer") // Filter out transfers
           .sort(
             (a: Booking, b: Booking) =>
               new Date(b.createdAt || b.date!).getTime() -
@@ -176,10 +152,6 @@ export default function DashboardPage() {
             (booking: Booking): SortedBooking => ({
               id: booking._id || booking.id,
               tour: booking.packageId?.title || booking.title,
-              transfer:
-                booking.packageType === "transfer"
-                  ? booking.packageId?.title || booking.title
-                  : null,
               date: booking.date
                 ? new Date(booking.date).toLocaleDateString("en-GB", {
                     day: "2-digit",
@@ -268,10 +240,8 @@ export default function DashboardPage() {
                 // Convert booking to package format for the PackageCard
                 const pkg = {
                   id: booking.id || "",
-                  title: booking.tour || booking.transfer || "Unknown Package",
-                  type: booking.transfer
-                    ? ("transfer" as const)
-                    : ("tour" as const),
+                  title: booking.tour || "Unknown Package",
+                  type: "tour" as const,
                   duration: "half-day", // Default value
                   currentBookings: 1,
                   maxSlots: 10,
