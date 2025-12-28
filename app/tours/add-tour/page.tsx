@@ -177,6 +177,7 @@ export default function AddTourPage() {
   const [sectionsExpanded, setSectionsExpanded] = useState({
     basicInfo: true,
     pricing: false,
+    statistics: false,
     departureTimes: false,
     tourDetails: false,
     faq: false,
@@ -702,6 +703,81 @@ export default function AddTourPage() {
                   </div>
                 </div>
               )}
+            </div>
+          </CollapsibleSection>
+
+          {/* Booking & Review Statistics */}
+          <CollapsibleSection
+            title="Booking & Review Statistics"
+            isExpanded={sectionsExpanded.statistics}
+            onToggle={() => toggleSection("statistics")}
+          >
+            <div className="space-y-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <p className="text-sm text-blue-800">
+                  <strong>Note:</strong> These values are used as initial
+                  display counts. The booking count will auto-increment when
+                  bookings are completed. Rating and review count should be set
+                  initially and will be updated when reviews are submitted.
+                </p>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Initial Booked Count
+                  </label>
+                  <input
+                    {...register("bookedCount", { valueAsNumber: true })}
+                    type="number"
+                    min="0"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="e.g., 100"
+                  />
+                  {errors.bookedCount && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.bookedCount.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Initial Rating (0-5)
+                  </label>
+                  <input
+                    {...register("rating", { valueAsNumber: true })}
+                    type="number"
+                    min="0"
+                    max="5"
+                    step="0.1"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="e.g., 4.5"
+                  />
+                  {errors.rating && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.rating.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Initial Review Count
+                  </label>
+                  <input
+                    {...register("reviewCount", { valueAsNumber: true })}
+                    type="number"
+                    min="0"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="e.g., 50"
+                  />
+                  {errors.reviewCount && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.reviewCount.message}
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
           </CollapsibleSection>
 

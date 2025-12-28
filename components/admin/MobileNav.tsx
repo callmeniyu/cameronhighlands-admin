@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { FiCompass, FiCalendar, FiUsers, FiBook } from "react-icons/fi";
+import { FiCompass, FiCalendar, FiUsers, FiBook, FiStar } from "react-icons/fi";
 import { RxDashboard } from "react-icons/rx";
 import { usePathname } from "next/navigation";
 
@@ -11,6 +11,7 @@ export default function MobileNav() {
     { name: "Home", path: "/", icon: RxDashboard },
     { name: "Bookings", path: "/bookings", icon: FiCalendar },
     { name: "Tours", path: "/tours", icon: FiCompass },
+    { name: "Reviews", path: "/reviews", icon: FiStar },
     { name: "Blogs", path: "/blogs", icon: FiBook },
   ];
 

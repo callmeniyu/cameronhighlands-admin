@@ -29,24 +29,38 @@ export default function RootLayout({
           <AdminLayout>{children}</AdminLayout>
           <Toaster
             position="top-right"
+            containerStyle={{ top: "3.5rem", right: "1.25rem" }}
             toastOptions={{
               duration: 4000,
               style: {
-                background: "#363636",
-                color: "#fff",
+                background: "#111827",
+                color: "#ffffff",
+                padding: "0.75rem 1rem",
+                borderRadius: "0.5rem",
+                boxShadow: "0 6px 18px rgba(0,0,0,0.25)",
+                border: "1px solid rgba(255,255,255,0.06)",
+                maxWidth: "28rem",
               },
               success: {
                 duration: 3000,
                 style: {
-                  background: "#10b981",
-                  color: "#fff",
+                  background: "#059669",
+                  color: "#ffffff",
+                  padding: "0.75rem 1rem",
+                  borderRadius: "0.5rem",
+                  boxShadow: "0 6px 18px rgba(0,0,0,0.15)",
+                  border: "1px solid rgba(0,0,0,0.06)",
                 },
               },
               error: {
                 duration: 4000,
                 style: {
-                  background: "#ef4444",
-                  color: "#fff",
+                  background: "#dc2626",
+                  color: "#ffffff",
+                  padding: "0.75rem 1rem",
+                  borderRadius: "0.5rem",
+                  boxShadow: "0 6px 18px rgba(0,0,0,0.25)",
+                  border: "1px solid rgba(255,255,255,0.06)",
                 },
               },
             }}

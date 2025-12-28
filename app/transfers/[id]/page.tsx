@@ -53,6 +53,8 @@ const transferSchema = z
     to: z.string().min(2, "To location is required"),
     duration: z.string().min(1, "Duration is required"),
     bookedCount: z.number().min(0),
+    rating: z.number().min(0).max(5).optional(),
+    reviewCount: z.number().min(0).optional(),
     oldPrice: z.number().min(0, "Old price must be 0 or greater"),
     newPrice: z.number().min(0, "New price must be 0 or greater"),
     childPrice: z
@@ -307,6 +309,7 @@ export default function EditTransferPage({
     basicInfo: true,
     routeInfo: true,
     pricing: false,
+    statistics: false,
     departureTimes: false,
     transferDetails: false,
     faq: false,
@@ -321,6 +324,8 @@ export default function EditTransferPage({
 
   const defaultValues = {
     bookedCount: 0,
+    rating: 0,
+    reviewCount: 0,
     type: "Van" as const,
     vehicle: "", // Vehicle name for private transfers
     label: "None" as const,
@@ -575,6 +580,8 @@ export default function EditTransferPage({
             to: transfer.to || "",
             duration: transfer.duration || "",
             bookedCount: transfer.bookedCount || 0,
+            rating: transfer.rating || 0,
+            reviewCount: transfer.reviewCount || 0,
             oldPrice: transfer.oldPrice || 0,
             newPrice: transfer.newPrice || 0,
             childPrice: transfer.childPrice || 0,
@@ -685,6 +692,7 @@ export default function EditTransferPage({
         basicInfo: true,
         routeInfo: true,
         pricing: false,
+        statistics: false,
         departureTimes: false,
         transferDetails: false,
         faq: false,
@@ -1663,29 +1671,81 @@ export default function EditTransferPage({
                         </p>
                       </div>
                     )}
+                  </div>
+                </CollapsibleSection>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Booked Count *
-                      </label>
-                      <div className="relative">
+                {/* Booking & Review Statistics */}
+                <CollapsibleSection
+                  title="Booking & Review Statistics"
+                  isExpanded={sectionsExpanded.statistics}
+                  onToggle={() => toggleSection("statistics")}
+                >
+                  <div className="space-y-4">
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                      <p className="text-sm text-blue-800">
+                        <strong>Note:</strong> These values are used as initial
+                        display counts. The booking count will auto-increment
+                        when bookings are completed. Rating and review count
+                        should be set initially and will be updated when reviews
+                        are submitted.
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Initial Booked Count
+                        </label>
                         <input
                           {...register("bookedCount", { valueAsNumber: true })}
                           type="number"
                           min="0"
-                          step="1"
-                          className={`w-full px-3 py-2 border rounded-md ${
-                            errors.bookedCount
-                              ? "border-red-500"
-                              : "border-gray-300"
-                          }`}
-                          placeholder="0"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="e.g., 100"
                         />
-                        <FiUsers className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                        {errors.bookedCount && (
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.bookedCount.message}
+                          </p>
+                        )}
                       </div>
-                      <p className="text-xs text-red-500 mt-1">
-                        {errors.bookedCount?.message}
-                      </p>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Initial Rating (0-5)
+                        </label>
+                        <input
+                          {...register("rating", { valueAsNumber: true })}
+                          type="number"
+                          min="0"
+                          max="5"
+                          step="0.1"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="e.g., 4.5"
+                        />
+                        {errors.rating && (
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.rating.message}
+                          </p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Initial Review Count
+                        </label>
+                        <input
+                          {...register("reviewCount", { valueAsNumber: true })}
+                          type="number"
+                          min="0"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="e.g., 50"
+                        />
+                        {errors.reviewCount && (
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.reviewCount.message}
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </CollapsibleSection>
