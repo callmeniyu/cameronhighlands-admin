@@ -64,14 +64,7 @@ const tourSchema = z
       about: z
         .string()
         .min(100, "About section must be at least 100 characters"),
-      itinerary: z
-        .array(
-          z.object({
-            time: z.string().min(1, "Time is required"),
-            activity: z.string().min(1, "Activity is required"),
-          })
-        )
-        .min(1, "At least one itinerary item is required"),
+      itinerary: z.string().min(50, "Itinerary must be at least 50 characters"),
       pickupLocations: z
         .array(z.string().min(1))
         .min(1, "At least one pickup location is required"),
@@ -209,7 +202,7 @@ export default function EditTourPage({ params }: { params: { id: string } }) {
     tags: [],
     details: {
       about: "",
-      itinerary: [{ time: "08:00 AM", activity: "" }],
+      itinerary: "",
       pickupLocations: [""],
       pickupGuidelines: "",
       notes: [""],
@@ -232,15 +225,6 @@ export default function EditTourPage({ params }: { params: { id: string } }) {
   });
 
   // Field arrays for dynamic lists
-  const {
-    fields: itineraryFields,
-    append: appendItinerary,
-    remove: removeItinerary,
-  } = useFieldArray({
-    control,
-    name: "details.itinerary",
-  });
-
   const {
     fields: faqFields,
     append: appendFaq,
@@ -405,9 +389,7 @@ export default function EditTourPage({ params }: { params: { id: string } }) {
         packageType: "tour",
         details: {
           ...data.details,
-          itinerary: data.details.itinerary.filter(
-            (item) => item.time && item.activity
-          ),
+          // itinerary is now a string, no filtering needed
           pickupLocations: data.details.pickupLocations.filter((loc) =>
             loc.trim()
           ),
@@ -952,42 +934,12 @@ export default function EditTourPage({ params }: { params: { id: string } }) {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Itinerary *
                 </label>
-                <div className="space-y-3">
-                  {itineraryFields.map((field, index) => (
-                    <div key={field.id} className="flex gap-2 items-start">
-                      <input
-                        {...register(
-                          `details.itinerary.${index}.time` as const
-                        )}
-                        type="text"
-                        className="w-32 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="08:00 AM"
-                      />
-                      <input
-                        {...register(
-                          `details.itinerary.${index}.activity` as const
-                        )}
-                        type="text"
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Activity description"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeItinerary(index)}
-                        className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-                      >
-                        <FiTrash2 />
-                      </button>
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => appendItinerary({ time: "", activity: "" })}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center gap-2"
-                  >
-                    <FiPlus /> Add Itinerary Item
-                  </button>
-                </div>
+                <textarea
+                  {...register("details.itinerary")}
+                  rows={8}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Describe the tour itinerary...&#10;&#10;Example:&#10;08:00 AM - Hotel Pickup&#10;09:00 AM - Visit Tea Plantation&#10;11:00 AM - Strawberry Farm&#10;12:30 PM - Lunch Break&#10;02:00 PM - Return to Hotel"
+                />
                 {errors.details?.itinerary && (
                   <p className="text-red-500 text-sm mt-1">
                     {errors.details.itinerary.message}
