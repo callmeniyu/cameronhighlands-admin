@@ -69,7 +69,9 @@ const tourSchema = z
         .array(z.string().min(1))
         .min(1, "At least one pickup location is required"),
       pickupGuidelines: z.string().optional(),
-      notes: z.array(z.string().min(1)).min(1, "At least one note is required"),
+      notes: z
+        .string()
+        .min(50, "Important notes must be at least 50 characters"),
       includes: z
         .array(z.string().min(1))
         .min(1, "At least one included item is required"),
@@ -205,7 +207,7 @@ export default function EditTourPage({ params }: { params: { id: string } }) {
       itinerary: "",
       pickupLocations: [""],
       pickupGuidelines: "",
-      notes: [""],
+      notes: "",
       includes: [""],
       faq: [{ question: "", answer: "" }],
     },
@@ -283,10 +285,11 @@ export default function EditTourPage({ params }: { params: { id: string } }) {
                 ? tourData.details.pickupLocations
                 : [""],
             pickupGuidelines: tourData.details?.pickupGuidelines || "",
-            notes:
-              tourData.details?.notes?.length > 0
-                ? tourData.details.notes
-                : [""],
+            notes: tourData.details?.notes
+              ? Array.isArray(tourData.details.notes)
+                ? tourData.details.notes.join("\n")
+                : tourData.details.notes
+              : "",
             includes:
               tourData.details?.includes?.length > 0
                 ? tourData.details.includes
@@ -393,7 +396,7 @@ export default function EditTourPage({ params }: { params: { id: string } }) {
           pickupLocations: data.details.pickupLocations.filter((loc) =>
             loc.trim()
           ),
-          notes: data.details.notes.filter((note) => note.trim()),
+          // notes is now a string, no filtering needed
           includes: data.details.includes.filter((inc) => inc.trim()),
           faq: data.details.faq.filter(
             (faq) => faq.question.trim() && faq.answer.trim()
@@ -1060,47 +1063,11 @@ export default function EditTourPage({ params }: { params: { id: string } }) {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Important Notes *
                 </label>
-                <Controller
-                  name="details.notes"
-                  control={control}
-                  render={({ field }) => (
-                    <div className="space-y-2">
-                      {field.value?.map((note, index) => (
-                        <div key={index} className="flex gap-2">
-                          <input
-                            type="text"
-                            value={note}
-                            onChange={(e) => {
-                              const newNotes = [...field.value];
-                              newNotes[index] = e.target.value;
-                              field.onChange(newNotes);
-                            }}
-                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="e.g., Wear comfortable shoes"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const newNotes = field.value.filter(
-                                (_, i) => i !== index
-                              );
-                              field.onChange(newNotes);
-                            }}
-                            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-                          >
-                            <FiTrash2 />
-                          </button>
-                        </div>
-                      ))}
-                      <button
-                        type="button"
-                        onClick={() => field.onChange([...field.value, ""])}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center gap-2"
-                      >
-                        <FiPlus /> Add Note
-                      </button>
-                    </div>
-                  )}
+                <textarea
+                  {...register("details.notes")}
+                  rows={8}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="List important notes for travelers...&#10;&#10;Example:&#10;• Wear comfortable walking shoes&#10;• Bring sunscreen and hat&#10;• Camera recommended&#10;• Tour may be rescheduled due to weather&#10;• Minimum 2 persons required"
                 />
                 {errors.details?.notes && (
                   <p className="text-red-500 text-sm mt-1">
